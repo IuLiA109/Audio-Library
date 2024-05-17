@@ -6,6 +6,6 @@ import audioLibrary.user.User;
 
 import java.sql.Connection;
 
-interface Command {
+public interface Command {
     User execute(String[] args, Connection connection, SqlManager manager) throws InvalidArgumentsException;
 }

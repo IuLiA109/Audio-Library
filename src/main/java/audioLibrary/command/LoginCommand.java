@@ -32,6 +32,8 @@ public class LoginCommand implements Command{
         if (userExists == 0) throw new InvalidArgumentsException();
         else if (userExists == 1){
             System.out.println("User logged in");
+            if (manager.isAdmin(username))
+                return new Administrator(username, password);
             return new AuthenticatedUser(username, password);
         }
         else throw new InvalidArgumentsException("PROBLEMA NOUA");

@@ -15,6 +15,7 @@ import java.util.Scanner;
 //java Main
 
 public class Main {
+
     public static void main(String[] args) {
         String url = "jdbc:mysql://localhost:3306/laborator";
         String username = "student";
@@ -22,44 +23,56 @@ public class Main {
 
         SqlManager manager = new SqlManager(url, username, password);
         //manager.createAccountTable();
+        //manager.insertInfoAccount(1, "admin", "admin", 1);
         //manager.deleteTable("Account");
         ///*
 
         Scanner scanner = new Scanner(System.in);
         String input;
         User user = new AnonymousUser();
+        User administrator = new Administrator("admin", "admin");
 
         try (Connection connection = DriverManager.getConnection(url, username, password)) {
             while (true) {
                 input = scanner.nextLine();
                 String[] parts = input.split("\\s+");
+                Command com = null;
                 if (parts[0].equals("login")) {
                     try {
-                        LoginCommand log = new LoginCommand(user);
-                        try {
-                            user = log.execute(parts, connection, manager);
-                            //sigleton
-                        } catch (InvalidArgumentsException e) {
-                            System.out.println(e.getMessage());
-                        }
+                        com = new LoginCommand(user);
                     } catch (InvalidUserTypeException e) {
                         System.out.println(e.getMessage());
                     }
-
                 }
                 else if (parts[0].equals("register")) {
                     try {
-                        RegisterCommand reg = new RegisterCommand(user);
-                        try {
-                            user = reg.execute(parts, connection, manager);
-                        } catch (InvalidArgumentsException e) {
-                            System.out.println(e.getMessage());
-                        }
+                        com = new RegisterCommand(user);
+                    } catch (InvalidUserTypeException e) {
+                        System.out.println(e.getMessage());
+                    }
+                }
+                else if (parts[0].equals("logout")) {
+                    try {
+                        com = new LogoutCommand(user);
+                    } catch (InvalidUserTypeException e) {
+                        System.out.println(e.getMessage());
+                    }
+                }
+                else if (parts[0].equals("promote")) {
+                    try {
+                        com = new PromoteCommand(user);
                     } catch (InvalidUserTypeException e) {
                         System.out.println(e.getMessage());
                     }
                 }
                 else if (parts[0].equals("exit")) break;
+
+                if(com != null)
+                    try {
+                        user = com.execute(parts, connection, manager);
+                    } catch (InvalidArgumentsException e) {
+                        System.out.println(e.getMessage());
+                    }
             }
         } catch (SQLException e) {
             e.printStackTrace();
