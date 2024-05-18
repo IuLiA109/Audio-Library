@@ -3,18 +3,31 @@
 import audioLibrary.command.*;
 import audioLibrary.exceptions.InvalidArgumentsException;
 import audioLibrary.exceptions.InvalidUserTypeException;
+import audioLibrary.music.Library;
 import audioLibrary.sql.SqlManager;
 import audioLibrary.user.*;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 //javac Main.java
 //java Main
 
 public class Main {
+
+    private static String[] trimInput(String input) {
+        String[] parts = input.split("\"");
+        List<String> result = new ArrayList<>();
+        for (String part : parts) {
+            part = part.trim();
+            if(!part.isEmpty() && !part.equals("create song"))
+                result.add(part);
+        }
+        return result.toArray(new String[0]);
+    }
 
     public static void main(String[] args) {
         String url = "jdbc:mysql://localhost:3306/laborator";
@@ -31,6 +44,7 @@ public class Main {
         String input;
         User user = new AnonymousUser();
         User administrator = new Administrator("admin", "admin");
+        Library library = Library.getInstance("C:/Users/Iulia/Desktop/Proiect PAO/AudioLibrary/src/main/java/audioLibrary/music/Library.csv");
 
         try (Connection connection = DriverManager.getConnection(url, username, password)) {
             while (true) {
@@ -65,6 +79,10 @@ public class Main {
                         System.out.println(e.getMessage());
                     }
                 }
+                else if (parts[0].equals("create") && parts[1].equals("song")) {
+                    parts = trimInput(input);
+                    library.createSong(parts[0], parts[1], parts[2]);
+                }
                 else if (parts[0].equals("exit")) break;
 
                 if(com != null)
@@ -78,76 +96,7 @@ public class Main {
             e.printStackTrace();
         }
 
-    scanner.close();
-
-    //*/
-
-        /*
-        Scanner scanner = new Scanner(System.in);
-        String input;
-        AuthenticationService authService = new AuthenticationService();
-
-        while (true) {
-            input = scanner.nextLine();
-            String[] parts = input.split("\\s+");
-
-            if (parts[0].equals("login")) {
-                authService.login(parts[1], parts[2]);
-            } else if (parts[0].equals("register")) {
-                authService.register(parts[1], parts[2]);
-            } else if (parts[0].equals("logout")) {
-                authService.logout();
-            } else if (input.equalsIgnoreCase("exit")) {
-                break;
-            } else {
-                System.out.println("Comanda necunoscută. Te rog să introduci buna, rea sau exit.");
-            }
-        }
-
+        //library.listSongs();
         scanner.close();
-        */
-
-        /*
-
-        AuthenticationService authService = new AuthenticationService();
-        boolean registrationSuccess = authService.register("john", "password123");
-        authService.register("iulia", "parola1");
-        authService.register("mia", "parola2");
-        authService.register("iulia", "parola3");
-        authService.register("milan", "parola2");
-
-        //System.out.println("RegisteredUsers: ");
-        //authService.printRegisteredUsers();
-
-        //System.out.println("LoggedInUsers: ");
-        //authService.printLoggedInUsers();
-
-        authService.login("john", "incorrectPassword");
-        authService.login("john", "password123");
-
-        */
-
-
-        /*
-        System.out.println("Registration successful: " + registrationSuccess);
-
-        boolean loginSuccess = authService.login("john", "password123");
-        System.out.println("Login successful: " + loginSuccess);
-
-        loginSuccess = authService.login("john", "incorrectPassword");
-        System.out.println("Login successful: " + loginSuccess);
-
-        boolean logoutSuccess = authService.logout("john");
-        System.out.println("Logout successful: " + logoutSuccess);
-
-        System.out.println("Is 'john' logged in? " + authService.isUserLoggedIn("john"));
-
-        System.out.println("RegisteredUsers: ");
-        authService.printRegisteredUsers();
-
-        System.out.println("LoggedInUsers: ");
-        authService.printLoggedInUsers();
-        */
-
-}
+    }
 }
