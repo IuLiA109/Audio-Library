@@ -1,6 +1,7 @@
 package audioLibrary.command;
 
 import audioLibrary.exceptions.InvalidArgumentsException;
+import audioLibrary.exceptions.InvalidCommandException;
 import audioLibrary.exceptions.InvalidUserTypeException;
 import audioLibrary.sql.SqlManager;
 import audioLibrary.user.AnonymousUser;
@@ -21,9 +22,9 @@ public class LogoutCommand implements Command{
     }
 
     @Override
-    public User execute(String[] args, Connection connection, SqlManager manager) throws InvalidArgumentsException {
+    public User execute(String[] args, Connection connection, SqlManager manager) throws InvalidCommandException {
         if (args.length != 1)
-            throw new InvalidArgumentsException("Invalid command!");
+            throw new InvalidCommandException();
         System.out.println("Successfully logged out");
         return new AnonymousUser();
     }

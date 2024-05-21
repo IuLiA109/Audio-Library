@@ -1,12 +1,16 @@
 package audioLibrary.command;
 
 import audioLibrary.exceptions.InvalidArgumentsException;
+import audioLibrary.exceptions.InvalidCommandException;
 import audioLibrary.exceptions.InvalidUserTypeException;
 import audioLibrary.sql.SqlManager;
 import audioLibrary.user.AuthenticatedUser;
 import audioLibrary.user.User;
 import audioLibrary.user.UserType;
 
+import java.io.FileWriter;
+import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -23,9 +27,9 @@ public class RegisterCommand implements Command{
     }
 
     @Override
-    public User execute(String[] args, Connection connection, SqlManager manager) throws InvalidArgumentsException {
+    public User execute(String[] args, Connection connection, SqlManager manager) throws InvalidArgumentsException, InvalidCommandException {
         if (args.length != 3)
-            throw new InvalidArgumentsException("Invalid command!");
+            throw new InvalidCommandException();
 
         String username = args[1];
         String password = args[2];
@@ -37,6 +41,16 @@ public class RegisterCommand implements Command{
         else if(userExists == 0) {
             manager.insertInfoAccount(nextId, username, password);
             System.out.println("Account created");
+
+            String jsonFilePath = "src/main/java/audioLibrary/music/Playlists/" + username + "_playlists.json";
+            File jsonFile = new File(jsonFilePath);
+            try (FileWriter writer = new FileWriter(jsonFilePath)) {
+                writer.write("[]");
+                writer.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             return new AuthenticatedUser(username, password);
         }
         else throw new InvalidArgumentsException("PROBLEMA NOUA");

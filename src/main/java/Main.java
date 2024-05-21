@@ -2,10 +2,15 @@
 
 import audioLibrary.command.*;
 import audioLibrary.exceptions.InvalidArgumentsException;
+import audioLibrary.exceptions.InvalidCommandException;
+import audioLibrary.exceptions.InvalidPlaylistNameException;
 import audioLibrary.exceptions.InvalidUserTypeException;
 import audioLibrary.music.Library;
+import audioLibrary.music.PlaylistManager;
 import audioLibrary.sql.SqlManager;
 import audioLibrary.user.*;
+//import main.java.audioLibrary.command.*;
+//import main.java.audioLibrary.user.*;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -19,7 +24,7 @@ import java.util.Scanner;
 public class Main {
 
     private static String[] trimInput(String input) {
-        String[] parts = input.split("\"");
+        String[] parts = input.split("\" "); //input.split("(?<=\") ");
         List<String> result = new ArrayList<>();
         for (String part : parts) {
             part = part.trim();
@@ -30,13 +35,13 @@ public class Main {
     }
 
     public static void main(String[] args) {
+
         String url = "jdbc:mysql://localhost:3306/laborator";
         String username = "student";
         String password = "student";
 
         SqlManager manager = new SqlManager(url, username, password);
         //manager.createAccountTable();
-        //manager.insertInfoAccount(1, "admin", "admin", 1);
         //manager.deleteTable("Account");
         ///*
 
@@ -45,12 +50,15 @@ public class Main {
         User user = new AnonymousUser();
         User administrator = new Administrator("admin", "admin");
         Library library = Library.getInstance("C:/Users/Iulia/Desktop/Proiect PAO/AudioLibrary/src/main/java/audioLibrary/music/Library.csv");
+        //Command com = null;
+        PlaylistManager playlistManager =  new PlaylistManager(user);
 
         try (Connection connection = DriverManager.getConnection(url, username, password)) {
             while (true) {
                 input = scanner.nextLine();
                 String[] parts = input.split("\\s+");
                 Command com = null;
+
                 if (parts[0].equals("login")) {
                     try {
                         com = new LoginCommand(user);
@@ -80,15 +88,26 @@ public class Main {
                     }
                 }
                 else if (parts[0].equals("create") && parts[1].equals("song")) {
-                    parts = trimInput(input);
-                    library.createSong(parts[0], parts[1], parts[2]);
+                    try {
+                        library.createSong(input, user);
+                    } catch (InvalidUserTypeException | InvalidCommandException e) {
+                        System.out.println(e.getMessage());
+                    }
+                }
+                else if (parts[0].equals("create") && parts[1].equals("playlist")) {
+                    try {
+                        playlistManager.createPlaylist(parts);
+                    } catch (InvalidUserTypeException | InvalidPlaylistNameException | InvalidCommandException e) {
+                        System.out.println(e.getMessage());
+                    }
                 }
                 else if (parts[0].equals("exit")) break;
 
                 if(com != null)
                     try {
                         user = com.execute(parts, connection, manager);
-                    } catch (InvalidArgumentsException e) {
+                        playlistManager.setUser(user);
+                    } catch (InvalidArgumentsException | InvalidCommandException e) {
                         System.out.println(e.getMessage());
                     }
             }

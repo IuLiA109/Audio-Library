@@ -31,6 +31,7 @@ public class SqlManager {
                 "admin INT DEFAULT 0);";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.executeUpdate();
+            insertInfoAccount(1, "admin", "admin", 1);
             System.out.println("Account table created successfully.");
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -53,7 +54,7 @@ public class SqlManager {
             statement.setInt(1, id);
             statement.setString(2, usernamee);
             statement.setString(3, passwordd);
-            //int rowsInserted = statement.executeUpdate();
+            int rowsInserted = statement.executeUpdate();
             //if (rowsInserted > 0) {
                 //System.out.println("A new row was inserted into the Users table.");
             //}
@@ -72,7 +73,7 @@ public class SqlManager {
             statement.setInt(1, id);
             statement.setString(2, usernamee);
             statement.setString(3, passwordd);
-            //int rowsInserted = statement.executeUpdate();
+            int rowsInserted = statement.executeUpdate();
             //if (rowsInserted > 0) {
                 //System.out.println("A new row was inserted into the Users table.");
             //}

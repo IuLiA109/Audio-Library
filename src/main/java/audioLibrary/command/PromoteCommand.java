@@ -1,6 +1,7 @@
 package audioLibrary.command;
 
 import audioLibrary.exceptions.InvalidArgumentsException;
+import audioLibrary.exceptions.InvalidCommandException;
 import audioLibrary.exceptions.InvalidUserTypeException;
 import audioLibrary.sql.SqlManager;
 import audioLibrary.user.Administrator;
@@ -21,9 +22,9 @@ public class PromoteCommand implements Command{
     }
 
     @Override
-    public User execute(String[] args, Connection connection, SqlManager manager) throws InvalidArgumentsException {
+    public User execute(String[] args, Connection connection, SqlManager manager) throws InvalidArgumentsException, InvalidCommandException {
         if (args.length != 2)
-            throw new InvalidArgumentsException("Invalid command!");
+            throw new InvalidCommandException();
 
         String username = args[1];
 

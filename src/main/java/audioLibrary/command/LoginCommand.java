@@ -20,9 +20,9 @@ public class LoginCommand implements Command{
     }
 
     @Override
-    public User execute(String[] args, Connection connection, SqlManager manager) throws InvalidArgumentsException{
+    public User execute(String[] args, Connection connection, SqlManager manager) throws InvalidCommandException, InvalidArgumentsException{
         if (args.length != 3)
-            throw new InvalidArgumentsException("Invalid command!");
+            throw new InvalidCommandException();
 
         String username = args[1];
         String password = args[2];

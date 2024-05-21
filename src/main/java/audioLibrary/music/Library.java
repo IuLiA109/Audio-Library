@@ -1,5 +1,10 @@
 package audioLibrary.music;
 
+import audioLibrary.exceptions.InvalidArgumentsException;
+import audioLibrary.exceptions.InvalidCommandException;
+import audioLibrary.exceptions.InvalidUserTypeException;
+import audioLibrary.user.User;
+import audioLibrary.user.UserType;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvValidationException;
@@ -7,10 +12,7 @@ import com.opencsv.exceptions.CsvValidationException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
 public class Library {
     private static Library instance;
@@ -54,7 +56,39 @@ public class Library {
         }
     }
 
-    public void createSong(String name, String author, String year) {
+    private String[] trimInput(String input) {
+        String[] parts = input.split("\" ");
+        List<String> result = new ArrayList<>();
+        for (String part : parts) {
+
+            part = part.trim();
+            if(!part.isEmpty() && !part.equals("create song"))
+                result.add(part);
+        }
+        return result.toArray(new String[0]);
+    }
+
+    //public void createSong(String name, String author, String year, User user) throws InvalidUserTypeException{
+    public void createSong(String input, User user) throws InvalidUserTypeException, InvalidCommandException {
+        if (user.getType() != UserType.Administrator)
+            throw new InvalidUserTypeException();
+
+        String [] args = trimInput(input);
+
+        if (args.length != 3)
+            throw new InvalidCommandException();
+        else{
+            args[0] = args[0].substring(12);
+            if(!args[0].startsWith("\"") || args[0].length()==1 || !args[1].startsWith("\"") || args[1].length()==1 || !args[2].matches("[0-9]+"))
+                throw new InvalidCommandException();
+            args[0] = args[0].substring(1);
+            args[1] = args[1].substring(1);
+        }
+
+        String name = args[0];
+        String author = args[1];
+        String year = args[2];
+
         Song song = new Song(name, author, Integer.parseInt(year));
         if (!songs.add(song)) {
             System.out.println("This song is already part of the library!");
