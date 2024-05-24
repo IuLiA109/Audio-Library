@@ -1,10 +1,7 @@
 //package org.example;
 
 import audioLibrary.command.*;
-import audioLibrary.exceptions.InvalidArgumentsException;
-import audioLibrary.exceptions.InvalidCommandException;
-import audioLibrary.exceptions.InvalidPlaylistNameException;
-import audioLibrary.exceptions.InvalidUserTypeException;
+import audioLibrary.exceptions.*;
 import audioLibrary.music.Library;
 import audioLibrary.music.PlaylistManager;
 import audioLibrary.sql.SqlManager;
@@ -49,7 +46,7 @@ public class Main {
         String input;
         User user = new AnonymousUser();
         User administrator = new Administrator("admin", "admin");
-        Library library = Library.getInstance("C:/Users/Iulia/Desktop/Proiect PAO/AudioLibrary/src/main/java/audioLibrary/music/Library.csv");
+        Library library = Library.getInstance("src/main/java/audioLibrary/music/Library.csv");
         //Command com = null;
         PlaylistManager playlistManager =  new PlaylistManager(user);
 
@@ -101,12 +98,22 @@ public class Main {
                         System.out.println(e.getMessage());
                     }
                 }
+                else if (parts[0].equals("add")) {
+                    try {
+                        playlistManager.addSong(parts);
+                    } catch (InvalidCommandException | InvalidUserTypeException | InvalidPlaylistNameException |
+                             InvalidSongIdException | SongAlreadyInPlaylistException e) {
+                        System.out.println(e.getMessage());
+                    }
+                }
                 else if (parts[0].equals("exit")) break;
+                else System.out.println("Invalid command!");
 
                 if(com != null)
                     try {
                         user = com.execute(parts, connection, manager);
                         playlistManager.setUser(user);
+                        //playlistManager.printPlaylists();
                     } catch (InvalidArgumentsException | InvalidCommandException e) {
                         System.out.println(e.getMessage());
                     }

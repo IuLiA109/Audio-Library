@@ -1,8 +1,14 @@
 [
   {
     "id": 1,
-    "name": "unu",
+    "name": "My Playlist",
     "songs": [
+      {
+        "id": 2,
+        "name": "Lele",
+        "author": "Loredana Groza",
+        "year": 2006
+      },
       {
         "id": 1,
         "name": "Snooze",
@@ -14,12 +20,6 @@
         "name": "Candy Shop",
         "author": "50 Cent",
         "year": 2009
-      },
-      {
-        "id": 2,
-        "name": "Lele",
-        "author": "Loredana Groza",
-        "year": 2006
       }
     ]
   }

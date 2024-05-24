@@ -16,9 +16,9 @@ import java.util.*;
 
 public class Library {
     private static Library instance;
-    private final Collection<Song> songs;
-    private final Map<Integer, Song> songsById = new HashMap<>();
-    private final Map<String, Song> songsByNameAndAuthor = new HashMap<>();
+    private  Collection<Song> songs;
+    private  Map<Integer, Song> songsById = new HashMap<>();
+    private  Map<String, Song> songsByName = new HashMap<>();
     private final String csvFilePath;
 
     private Library(String csvFilePath) {
@@ -43,6 +43,8 @@ public class Library {
                 }
                 Song song = new Song(nextRecord[1], nextRecord[2], Integer.parseInt(nextRecord[3]));
                 songs.add(song);
+                songsById.put(song.getId(), song);
+                songsByName.put(song.getName(), song);
             }
         } catch (IOException | CsvValidationException e) {
             e.printStackTrace();
@@ -107,5 +109,13 @@ public class Library {
         for (Song song : songs) {
             System.out.println(song);
         }
+    }
+
+    public boolean containsSongWithId(int id) {
+        return songsById.containsKey(id);
+    }
+
+    public Map<Integer, Song> getSongsById(){
+        return songsById;
     }
 }

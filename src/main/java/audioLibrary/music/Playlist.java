@@ -1,24 +1,15 @@
 package audioLibrary.music;
 
-import audioLibrary.exceptions.InvalidPlaylistNameException;
-import audioLibrary.exceptions.InvalidUserTypeException;
-import audioLibrary.user.User;
-import audioLibrary.user.UserType;
-import com.google.gson.Gson;
-
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 
 public class Playlist {
     private static int idCounter = 1;
     private Integer id;
     private String name;
-    private final Collection<Song> songs;
+    private Collection<Song> songs;
     //private final User user;
     //private static final Gson gson = new Gson();
 
@@ -61,5 +52,22 @@ public class Playlist {
 
     public String getName() {
         return name;
+    }
+
+    public Boolean addSongToPlaylist(Integer songId) {
+        Library library = Library.getInstance("src/main/java/audioLibrary/music/Library.csv");
+        Song song = library.getSongsById().get(songId);
+        if (!songs.contains(song)) {
+            songs.add(song);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    @Override
+    public String toString(){
+        return this.id + ", " + this.name + "\n";
     }
 }
