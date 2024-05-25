@@ -156,7 +156,7 @@ public class PlaylistManager {
             String[] songsIdString = parts[1].split(" ");
 
             for (String number : songsIdString) {
-                if(!library.containsSongWithId(Integer.parseInt(number)))
+                if (!library.containsSongWithId(Integer.parseInt(number)))
                     throw new InvalidSongIdException();
             }
 
@@ -168,8 +168,46 @@ public class PlaylistManager {
 
             updatePlaylistJson(playlist);
 
+        } else throw new InvalidCommandException();
+    }
+
+        public void listPlaylists(String[] parts) throws InvalidCommandException, InvalidUserTypeException{
+        Integer pageNumber = 1;
+        if (parts.length > 3)
+            throw new InvalidCommandException();
+        if(parts.length == 3 && !parts[2].matches("\\d+"))
+            throw new InvalidCommandException();
+        if(parts.length == 3) pageNumber = Integer.parseInt(parts[2]);
+        if(user.getType() == UserType.Anonymous)
+            throw new InvalidUserTypeException();
+
+        Utils.paginate(user.getPlaylists(), 5, pageNumber);
+
+        /*List<Playlist> playlists = user.getPlaylists();
+        Integer itemsPerPage = 5;
+        Integer maxItemsPerPage = 5;
+        Integer numberOfPlaylists = playlists.size();
+        Integer pages = (int) Math.ceil((double) numberOfPlaylists / itemsPerPage);
+
+        if(pageNumber > pages || pageNumber.equals(0)) {
+            System.out.println("Page 0 of 0 (" + maxItemsPerPage +" items per page):");
+            return;
         }
-        else throw new InvalidCommandException();
+
+        System.out.println("Page " + pageNumber + " of " + pages + " (" + maxItemsPerPage + " items per page):");
+        if(itemsPerPage > (numberOfPlaylists - (pageNumber-1) * itemsPerPage)) itemsPerPage = numberOfPlaylists - (pageNumber-1) * itemsPerPage;
+        for(int i = 0; i < itemsPerPage; i++){
+            Playlist playlist = playlists.get((pageNumber-1) * maxItemsPerPage + i);
+            System.out.print(((pageNumber-1) * maxItemsPerPage + i + 1) + ".");
+            System.out.println(playlist.toString());
+        }
+
+        if(pages > pageNumber) {
+            System.out.println("To return the next page run the query as follows:");
+            System.out.println("'list playlists " + (pageNumber + 1) + "'");
+        }*/
+
+        }
 
         /*
         parts =  a.split("\" ");
@@ -189,10 +227,12 @@ public class PlaylistManager {
             if(!Character.isDigit(c) && !Character.isWhitespace(c))
                 throw new InvalidCommandException();
         }
+        }
+
 
          */
 
-        return;
+        //return;
 /*
         if(parts[1].equals("byName")){
             if(parts[2].startsWith("\"")) {
@@ -221,6 +261,5 @@ public class PlaylistManager {
         }
         else throw new InvalidCommandException();
 */
-    }
 
 }

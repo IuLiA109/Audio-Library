@@ -68,6 +68,6 @@ public class Playlist {
 
     @Override
     public String toString(){
-        return this.id + ", " + this.name + "\n";
+        return this.name + " [ID: " + this.id + "]";
     }
 }

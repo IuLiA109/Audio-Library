@@ -42,11 +42,6 @@ public class Song {
     }
 
     public String toString() {
-        return "Song{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", author='" + author + '\'' +
-                ", year=" + year +
-                '}';
+        return this.author + " - " + this.name + " (" + this.year + ") [ID: " + this.id + "]";
     }
 }

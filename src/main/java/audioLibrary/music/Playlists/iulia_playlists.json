@@ -1,26 +1,37 @@
 [
   {
     "id": 1,
-    "name": "unu",
-    "songs": [
-      {
-        "id": 1,
-        "name": "Snooze",
-        "author": "SZA",
-        "year": 2023
-      },
-      {
-        "id": 3,
-        "name": "Candy Shop",
-        "author": "50 Cent",
-        "year": 2009
-      },
-      {
-        "id": 2,
-        "name": "Lele",
-        "author": "Loredana Groza",
-        "year": 2006
-      }
-    ]
+    "name": "adjdj",
+    "songs": []
+  },
+  {
+    "id": 2,
+    "name": "kjal",
+    "songs": []
+  },
+  {
+    "id": 3,
+    "name": "khalhdkda",
+    "songs": []
+  },
+  {
+    "id": 4,
+    "name": "jdkdgk ck dck jh",
+    "songs": []
+  },
+  {
+    "id": 5,
+    "name": "kbakdbdadsd",
+    "songs": []
+  },
+  {
+    "id": 6,
+    "name": "jj",
+    "songs": []
+  },
+  {
+    "id": 7,
+    "name": "kkjhakd",
+    "songs": []
   }
 ]

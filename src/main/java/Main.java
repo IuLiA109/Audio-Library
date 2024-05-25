@@ -1,5 +1,6 @@
 //package org.example;
 
+import audioLibrary.Utils;
 import audioLibrary.command.*;
 import audioLibrary.exceptions.*;
 import audioLibrary.music.Library;
@@ -32,6 +33,13 @@ public class Main {
     }
 
     public static void main(String[] args) {
+        /*
+        String criterioType = "author";
+        String input2 = "search author \"Lady Gaga\" 2";
+        String[] parts2 = Utils.trimInput(input2, "search " + criterioType + " ");
+        for(String part: parts2)
+            System.out.println(part);
+        */
 
         String url = "jdbc:mysql://localhost:3306/laborator";
         String username = "student";
@@ -103,6 +111,20 @@ public class Main {
                         playlistManager.addSong(parts);
                     } catch (InvalidCommandException | InvalidUserTypeException | InvalidPlaylistNameException |
                              InvalidSongIdException | SongAlreadyInPlaylistException e) {
+                        System.out.println(e.getMessage());
+                    }
+                }
+                else if (parts[0].equals("list") && parts[1].equals("playlists")) {
+                    try {
+                        playlistManager.listPlaylists(parts);
+                    } catch (InvalidCommandException | InvalidUserTypeException e) {
+                        System.out.println(e.getMessage());
+                    }
+                }
+                else if (parts[0].equals("search")) {
+                    try {
+                        library.searchSong(parts, input);
+                    } catch (InvalidCommandException e) {
                         System.out.println(e.getMessage());
                     }
                 }
