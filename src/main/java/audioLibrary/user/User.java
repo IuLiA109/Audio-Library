@@ -1,7 +1,5 @@
 package audioLibrary.user;
 
-import audioLibrary.exceptions.InvalidPlaylistNameException;
-import audioLibrary.exceptions.InvalidUserTypeException;
 import audioLibrary.music.Playlist;
 
 import java.util.List;
@@ -11,7 +9,7 @@ public interface User {
     String getPassword();
     List<Playlist> getPlaylists();
     void addInPlaylists(Playlist newPlaylist);
-    //void loadPlaylists();
-    //void createPlaylist(String name) throws InvalidUserTypeException, InvalidPlaylistNameException;
+    void addAudit(String input);
+    void addAuditSuccess(Boolean success);
     UserType getType();
 }

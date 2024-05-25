@@ -12,7 +12,6 @@ import audioLibrary.exceptions.*;
 
 public class LoginCommand implements Command{
     private User user;
-
     public LoginCommand(User user) throws InvalidUserTypeException{
         if (user.getType() != UserType.Anonymous)
             throw new InvalidUserTypeException();

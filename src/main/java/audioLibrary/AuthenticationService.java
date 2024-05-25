@@ -1,4 +1,4 @@
-package audioLibrary;
+/*package audioLibrary;
 import audioLibrary.user.*;
 
 import java.util.HashMap;
@@ -79,4 +79,4 @@ public class AuthenticationService {
         }
     }
 }
-
+*/

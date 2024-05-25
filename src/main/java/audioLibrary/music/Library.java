@@ -21,10 +21,7 @@ public class Library {
     private  Map<Integer, Song> songsById = new HashMap<>();
     private  Map<String, List<Song>> songsByName = new HashMap<>();
     private  Map<String, List<Song>> songsByAuthor = new HashMap<>();
-
-    //private  Map<String, Song> songsByName = new HashMap<>();
-    //private  Map<String, Song> songsByAuthor = new HashMap<>();
-    private final String csvFilePath;
+    private final String csvFilePath ;
 
     private Library(String csvFilePath) {
         this.csvFilePath = csvFilePath;
@@ -39,6 +36,9 @@ public class Library {
         return instance;
     }
 
+    /**
+     * Reads song data from the CSV file and populates the library.
+     */
     private void readCSV() {
         try (CSVReader reader = new CSVReader(new FileReader(csvFilePath))) {
             String[] nextRecord;
@@ -57,15 +57,18 @@ public class Library {
                 songList = songsByAuthor.getOrDefault(song.getAuthor(), new ArrayList<>());
                 songList.add(song);
                 songsByAuthor.put(song.getAuthor(), songList);
-
-                //songsByName.put(song.getName(), song);
-                //songsByAuthor.put(song.getAuthor(), song);
             }
         } catch (IOException | CsvValidationException e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Writes song data to the CSV file.
+     *
+     * @param song the song to be written to the CSV file
+     * @throws IOException if an I/O error occurs while writing to the file
+     */
     private void writeCSV(Song song) throws IOException {
         try (CSVWriter writer = new CSVWriter(new FileWriter(csvFilePath, true))) {
             String[] songData = {String.valueOf(song.getId()), song.getName(), song.getAuthor(), String.valueOf(song.getYear())};
@@ -83,7 +86,7 @@ public class Library {
         }
     }
 
-    private String[] trimInput(String input) {
+    /*private String[] trimInput(String input) {
         String[] parts = input.split("\" ");
         List<String> result = new ArrayList<>();
         for (String part : parts) {
@@ -93,20 +96,28 @@ public class Library {
                 result.add(part);
         }
         return result.toArray(new String[0]);
-    }
+    }*/
 
-    //public void createSong(String name, String author, String year, User user) throws InvalidUserTypeException{
+    /**
+     * Creates a new song based on the input command.
+     *
+     * @param input the input command for creating the song
+     * @param user  the user attempting to create the song
+     * @throws InvalidUserTypeException if the user is not an administrator
+     * @throws InvalidCommandException  if the input command is invalid
+     */
     public void createSong(String input, User user) throws InvalidUserTypeException, InvalidCommandException {
         if (user.getType() != UserType.Administrator)
             throw new InvalidUserTypeException();
 
-        String [] args = trimInput(input);
+        //String [] args = trimInput(input);
+        String [] args = Utils.trimInput(input, "create song ");
 
         if (args.length != 3)
             throw new InvalidCommandException();
         else{
-            args[0] = args[0].substring(12);
-            if(!args[0].startsWith("\"") || args[0].length()==1 || !args[1].startsWith("\"") || args[1].length()==1 || !args[2].matches("[0-9]+"))
+            //args[0] = args[0].substring(12);
+            if(!args[0].startsWith("\"") || args[0].length() == 1 || !args[1].startsWith("\"") || args[1].length() == 1 || !args[2].matches("[0-9]+"))
                 throw new InvalidCommandException();
             args[0] = args[0].substring(1);
             args[1] = args[1].substring(1);
@@ -126,7 +137,7 @@ public class Library {
 
         } catch (IOException e) {
             System.out.println(e.getMessage());
-            System.out.println("Failed to write the song to the CSV file.");
+            //System.out.println("Failed to write the song to the CSV file.");
         }
         System.out.println("Added " + name + " by " + author + " to the library");
     }
@@ -137,38 +148,46 @@ public class Library {
         }
     }
 
-    public void searchSong(String[] parts, String input) throws InvalidCommandException{
-        //if(parts.length < 3)
-            //throw new InvalidCommandException();
-        String criterioType = parts[1];
+    /**
+     * Searches for songs based on the specified criterion and displays the results.
+     *
+     * @param parts the parts of the input command
+     * @param input the input command for searching songs
+     * @param user  the user attempting to search for songs
+     * @throws InvalidCommandException  if the input command is invalid
+     * @throws InvalidUserTypeException if the user is not authenticated
+     */
+    public void searchSong(String[] parts, String input, User user) throws InvalidCommandException, InvalidUserTypeException{
+        if (user.getType() == UserType.Anonymous)
+            throw new InvalidUserTypeException();
+
+        if(parts.length < 3)
+            throw new InvalidCommandException();
+        String criterionType = parts[1];
         Integer pageNumber = 1;
 
-        //parts = input.split("search " + criterioType + " \"");
-        parts = Utils.trimInput(input, "search " + criterioType + " ");
+        parts = Utils.trimInput(input, "search " + criterionType + " ");
 
-        String criterio;
+        String criterion;
         if(parts.length > 2)
             throw new InvalidCommandException();
 
-        if(parts[0].startsWith("\"")) criterio = parts[0].substring(1);
+        if(parts[0].startsWith("\"")) criterion = parts[0].substring(1);
         else throw new InvalidCommandException();
 
         if(parts.length == 2){
             if(parts[1].matches("\\d+"))
                 pageNumber = Integer.parseInt(parts[1]);
             else throw new InvalidCommandException();
-            //if(parts[0].startsWith("\"")) criterio = parts[0].substring(1);
-            //else throw new InvalidCommandException();
-
         }
         else {
-            criterio = criterio.substring(0, criterio.length() - 1);
+            criterion = criterion.substring(0, criterion.length() - 1);
         }
 
         Map<String, List<Song>> songsMap;
-        if(criterioType.equals("author"))
+        if(criterionType.equals("author"))
             songsMap = this.songsByAuthor;
-        else if(criterioType.equals("name"))
+        else if(criterionType.equals("name"))
             songsMap = this.songsByName;
         else throw new InvalidCommandException();
 
@@ -176,22 +195,16 @@ public class Library {
         for (Map.Entry<String, List<Song>> entry : songsMap.entrySet()) {
             String songCriterio = entry.getKey();
             List<Song> songList = entry.getValue();
-            if(songCriterio.startsWith(criterio))
+            if(songCriterio.startsWith(criterion))
                 result.addAll(songList);
         }
 
-        Utils.paginate(result, 5, pageNumber);
-        /*
-        for ( song : songsMap) {
-            if (criterioType.equals("author") && song.getAuthor().startsWith(criterio)) {
-                result.add(song);
-            } else if (criterioType.equals("name") && song.getName().startsWith(criterio)) {
-                result.add(song);
-            }
+        Integer pageSize = 5;
+        Utils.paginate(result, pageSize, pageNumber);
+        Integer pages = (int) Math.ceil((double) result.size() / pageSize);
+        if(pages > pageNumber) {
+            System.out.println("'search " + criterionType + " \"" + criterion + "\" " + (pageNumber + 1) + "'");
         }
-         */
-
-
     }
 
     public boolean containsSongWithId(int id) {

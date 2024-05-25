@@ -41,6 +41,7 @@ public class RegisterCommand implements Command{
         else if(userExists == 0) {
             manager.insertInfoAccount(nextId, username, password);
             System.out.println("Account created");
+            System.out.println("User logged in");
 
             String jsonFilePath = "src/main/java/audioLibrary/music/Playlists/" + username + "_playlists.json";
             File jsonFile = new File(jsonFilePath);
@@ -50,6 +51,9 @@ public class RegisterCommand implements Command{
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+            String FilePath = "src/main/java/audioLibrary/audit/" + username + "_audit.myformat";
+            File file = new File(jsonFilePath);
 
             return new AuthenticatedUser(username, password);
         }

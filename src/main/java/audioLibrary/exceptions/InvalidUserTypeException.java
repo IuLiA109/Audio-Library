@@ -2,7 +2,7 @@ package audioLibrary.exceptions;
 
 public class InvalidUserTypeException extends Exception{
     public InvalidUserTypeException(){
-        super("Your user type is not authorized to perform this command");
+        super("You do not have the permission to use this!");
     }
     public InvalidUserTypeException(String message){
         super(message);

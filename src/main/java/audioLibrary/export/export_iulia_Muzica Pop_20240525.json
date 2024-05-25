@@ -1,0 +1,23 @@
+{
+"name": "Muzica Pop",
+"objects": [
+  {
+    "id": 1,
+    "name": "Need You Now",
+    "author": "Lady A",
+    "year": 2009
+  },
+  {
+    "id": 4,
+    "name": "Despacito",
+    "author": "Luis Fonsi ft. Daddy Yankee",
+    "year": 2017
+  },
+  {
+    "id": 16,
+    "name": "Shape of You",
+    "author": "Ed Sheeran",
+    "year": 2017
+  }
+]
+}

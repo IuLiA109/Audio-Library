@@ -16,19 +16,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlaylistManager {
-    private Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private User user;
 
     public PlaylistManager(User user) {
         this.user = user;
     }
 
-    public void createPlaylist(String [] parts) throws InvalidUserTypeException, InvalidPlaylistNameException, InvalidCommandException {
+    /**
+     * Creates a new playlist with the given name for the user.
+     *
+     * @param parts the array containing the command and the name of the playlist
+     * @throws InvalidUserTypeException     if the user is not authenticated
+     * @throws InvalidPlaylistNameException if the playlist name already exists
+     * @throws InvalidCommandException      if the command is invalid
+     */
+    public void createPlaylist(String[] parts) throws InvalidUserTypeException, InvalidPlaylistNameException, InvalidCommandException {
         if (parts.length == 2)
             throw new InvalidCommandException();
 
         String playlistName = "";
-        for(int i = 2; i < parts.length; i++){
+        for (int i = 2; i < parts.length; i++) {
             playlistName = playlistName + parts[i] + " ";
         }
         playlistName = playlistName.substring(0, playlistName.length() - 1);
@@ -45,12 +53,12 @@ public class PlaylistManager {
         user.addInPlaylists(newPlaylist);
 
         String jsonFilePath = "src/main/java/audioLibrary/music/Playlists/" + user.getUsername() + "_playlists.json";
-        try (FileWriter writer = new FileWriter(jsonFilePath)) {
-            gson.toJson(user.getPlaylists(), writer);
-            writer.write("\n");
+        try{
+            Utils.writeInJson(jsonFilePath, user.getPlaylists());
             System.out.println("Playlist " + playlistName + " was created successfully!");
-        } catch (IOException e) {
-            e.printStackTrace();
+        }
+        catch (IOException e) {
+            System.out.println(e.getMessage());
         }
     }
 
@@ -72,23 +80,22 @@ public class PlaylistManager {
         return playlists;
     }
 
-    private void updatePlaylistJson(Playlist playlist) {
+    private void updatePlaylistsJson() {
         String jsonFilePath = "src/main/java/audioLibrary/music/Playlists/" + user.getUsername() + "_playlists.json";
         try (FileWriter writer = new FileWriter(jsonFilePath)) {
             gson.toJson(user.getPlaylists(), writer);
             writer.write("\n");
-            //System.out.println("Playlist updated successfully!");
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
 
-    public void setUser(User user){
+    public void setUser(User user) {
         this.user = user;
     }
 
-    public void printPlaylists(){
-        for(Playlist p: user.getPlaylists()){
+    public void printPlaylists() {
+        for (Playlist p : user.getPlaylists()) {
             System.out.println(p.toString());
         }
     }
@@ -111,33 +118,37 @@ public class PlaylistManager {
         return null;
     }
 
-    public void addSong(String [] parts) throws InvalidCommandException, InvalidUserTypeException, InvalidPlaylistNameException, InvalidSongIdException, SongAlreadyInPlaylistException {
+    /**
+     * Adds songs to a playlist specified by name or ID.
+     *
+     * @param parts the array containing the command and parameters
+     * @throws InvalidCommandException        if the command is invalid
+     * @throws InvalidUserTypeException       if the user is not authenticated
+     * @throws InvalidPlaylistNameException   if the playlist name or ID is invalid
+     * @throws InvalidSongIdException         if the song ID is invalid
+     * @throws SongAlreadyInPlaylistException if the song is already in the playlist
+     */
+    public void addSong(String[] parts) throws InvalidCommandException, InvalidUserTypeException, InvalidPlaylistNameException, InvalidSongIdException, SongAlreadyInPlaylistException {
         if (user.getType() == UserType.Anonymous)
             throw new InvalidUserTypeException();
 
         if (parts[1].equals("byName") || parts[1].equals("byId")) {
-            String criterion = parts[1];
+            String criterio = parts[1];
             Library library = Library.getInstance("src/main/java/audioLibrary/music/Library.csv");
 
             String a = "";
             for (String part : parts) {
                 a = a + part + " ";
             }
-            //System.out.println(a);
 
-            parts = Utils.trimInput(a, "add " + criterion + " ");
-            //parts[0] = parts[0].substring(11);
+            parts = Utils.trimInput(a, "add " + criterio + " ");
 
-            /*for (String part : parts) {
-                System.out.println(part);
-            }
-            */
             if (parts.length != 2 || !parts[0].startsWith("\"") || parts[0].length() == 1)
                 throw new InvalidCommandException();
 
             String playlistIndicater = parts[0].substring(1);
 
-            ArrayList<Integer> songsId = new ArrayList<>();
+            //ArrayList<Integer> songsId = new ArrayList<>();
 
             for (int i = 0; i < parts[1].length(); i++) {
                 Character c = parts[1].charAt(i);
@@ -146,7 +157,7 @@ public class PlaylistManager {
             }
 
             Playlist playlist;
-            if (criterion.equals("byName"))
+            if (criterio.equals("byName"))
                 playlist = getPlaylistByName(playlistIndicater);
             else
                 playlist = getPlaylistById(Integer.parseInt(playlistIndicater));
@@ -166,22 +177,76 @@ public class PlaylistManager {
                     throw new SongAlreadyInPlaylistException(Integer.parseInt(number));
             }
 
-            updatePlaylistJson(playlist);
+            updatePlaylistsJson();
+            System.out.println("The songs have been successfully added to the playlist!");
 
         } else throw new InvalidCommandException();
     }
 
-        public void listPlaylists(String[] parts) throws InvalidCommandException, InvalidUserTypeException{
+    /**
+     * Exports a playlist specified by name or ID to the specified format.
+     *
+     * @param parts the array containing the command and parameters
+     * @throws InvalidUserTypeException     if the user is not authenticated
+     * @throws InvalidCommandException      if the command is invalid
+     * @throws InvalidPlaylistNameException if the playlist name or ID is invalid
+     */
+    public void exportPlaylist(String [] parts) throws InvalidUserTypeException, InvalidCommandException, InvalidPlaylistNameException{
+        Playlist playlist;
+        Integer playlistId;
+        String playlistName;
+        String format;
+
+        if (user.getType() == UserType.Anonymous)
+            throw new InvalidUserTypeException();
+
+        if(parts.length < 4)
+            throw new InvalidCommandException();
+
+        String playlistIndicator = parts[2]; //name or id
+        for(int i = 3; i < parts.length - 1; i++){
+            playlistIndicator = playlistIndicator + " " + parts[i];
+        }
+        format = parts[parts.length-1];
+
+        if(playlistIndicator.matches("\\d+")) {
+            playlistId = Integer.parseInt(playlistIndicator);
+            playlist = getPlaylistById(playlistId);
+        }
+        else {
+            playlistName = playlistIndicator;
+            playlist = getPlaylistByName(playlistName);
+        }
+        if (playlist == null) throw new InvalidPlaylistNameException("The desired playlist does not exist");
+
+
+
+        playlist.exportPlaylist(format, user.getUsername());
+    }
+
+    /**
+     * Lists the playlists of the authenticated user.
+     *
+     * @param parts the array containing the command and parameters
+     * @throws InvalidCommandException if the command is invalid
+     * @throws InvalidUserTypeException if the user is not authenticated
+     */
+    public void listPlaylists(String[] parts) throws InvalidCommandException, InvalidUserTypeException {
         Integer pageNumber = 1;
         if (parts.length > 3)
             throw new InvalidCommandException();
-        if(parts.length == 3 && !parts[2].matches("\\d+"))
+        if (parts.length == 3 && !parts[2].matches("\\d+"))
             throw new InvalidCommandException();
-        if(parts.length == 3) pageNumber = Integer.parseInt(parts[2]);
-        if(user.getType() == UserType.Anonymous)
+        if (parts.length == 3) pageNumber = Integer.parseInt(parts[2]);
+        if (user.getType() == UserType.Anonymous)
             throw new InvalidUserTypeException();
 
-        Utils.paginate(user.getPlaylists(), 5, pageNumber);
+        Integer pageSize = 5;
+        Utils.paginate(user.getPlaylists(), pageSize, pageNumber);
+        Integer pages = (int) Math.ceil((double) user.getPlaylists().size() / pageSize);
+        if(pages > pageNumber) {
+            System.out.println("'list playlists " + (pageNumber + 1) + "'");
+        }
 
         /*List<Playlist> playlists = user.getPlaylists();
         Integer itemsPerPage = 5;
@@ -207,7 +272,7 @@ public class PlaylistManager {
             System.out.println("'list playlists " + (pageNumber + 1) + "'");
         }*/
 
-        }
+    }
 
         /*
         parts =  a.split("\" ");
@@ -232,7 +297,7 @@ public class PlaylistManager {
 
          */
 
-        //return;
+    //return;
 /*
         if(parts[1].equals("byName")){
             if(parts[2].startsWith("\"")) {
