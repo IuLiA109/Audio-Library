@@ -86,18 +86,6 @@ public class Library {
         }
     }
 
-    /*private String[] trimInput(String input) {
-        String[] parts = input.split("\" ");
-        List<String> result = new ArrayList<>();
-        for (String part : parts) {
-
-            part = part.trim();
-            if(!part.isEmpty() && !part.equals("create song"))
-                result.add(part);
-        }
-        return result.toArray(new String[0]);
-    }*/
-
     /**
      * Creates a new song based on the input command.
      *
